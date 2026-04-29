@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>InterviewAI — Mock Interview Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <!-- Setup Overlay -->
+  <div id="setup-overlay" class="overlay active">
+    <div class="setup-card">
+      <div class="setup-header">
+        <div class="logo-mark">AI</div>
+        <h1>Interview<em>Studio</em></h1>
+        <p>Paste your job description and résumé to begin a realistic AI mock interview with voice.</p>
+      </div>
+
+      <div class="setup-form">
+        <div class="form-row">
+          <label>Your Name</label>
+          <input type="text" id="candidate-name" placeholder="e.g. Alex Johnson" value="Candidate" />
+        </div>
+        <div class="form-row">
+          <label>Job Description <span class="req">*</span></label>
+          <textarea id="jd-input" placeholder="Paste the full job description here…" rows="6"></textarea>
+        </div>
+        <div class="form-row">
+          <label>Your Résumé <span class="req">*</span></label>
+          <textarea id="resume-input" placeholder="Paste your résumé text here…" rows="6"></textarea>
+        </div>
+        <button id="start-btn" class="btn-primary">Begin Interview</button>
+        <p id="setup-error" class="error-msg"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="app" class="app hidden">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-mark-sm">AI</div>
+        <span>Interview<em>Studio</em></span>
+      </div>
+
+      <div class="sidebar-section">
+        <h3>Session</h3>
+        <div class="session-info">
+          <div class="info-row">
+            <span class="label">Candidate</span>
+            <span id="sidebar-name" class="value">—</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Status</span>
+            <span id="sidebar-status" class="value status-badge live">Live</span>
+          </div>
+          <div class="info-row">
+            <span class="label">Exchanges</span>
+            <span id="sidebar-exchanges" class="value">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-section expandable">
+        <h3 id="jd-toggle">Job Description <span class="chevron">▾</span></h3>
+        <div id="jd-preview" class="preview-text"></div>
+      </div>
+
+      <div class="sidebar-section expandable">
+        <h3 id="resume-toggle">Résumé <span class="chevron">▾</span></h3>
+        <div id="resume-preview" class="preview-text"></div>
+      </div>
+
+      <div class="sidebar-actions">
+        <button id="feedback-btn" class="btn-secondary">Get Feedback</button>
+        <button id="restart-btn" class="btn-ghost">New Session</button>
+      </div>
+    </aside>
+
+    <!-- Main Interview Area -->
+    <main class="interview-main">
+      <!-- Top bar -->
+      <header class="top-bar">
+        <button id="sidebar-toggle" class="icon-btn" title="Toggle sidebar">☰</button>
+        <div class="interviewer-label">
+          <div class="interviewer-dot"></div>
+          <span>Alex — Senior Interviewer</span>
+        </div>
+        <div class="mic-status" id="mic-status-indicator">
+          <span class="mic-dot"></span>
+          <span id="mic-label">Mic ready</span>
+        </div>
+      </header>
+
+      <!-- Interviewer Avatar -->
+      <section class="avatar-section">
+        <div class="avatar-wrapper" id="avatar-wrapper">
+          <div class="avatar-rings">
+            <div class="ring r1"></div>
+            <div class="ring r2"></div>
+            <div class="ring r3"></div>
+          </div>
+          <div class="avatar-face" id="avatar-face">
+            <div class="avatar-inner">
+              <svg viewBox="0 0 120 120" class="face-svg" id="face-svg">
+                <!-- Head outline -->
+                <ellipse cx="60" cy="55" rx="38" ry="44" fill="var(--avatar-skin)" />
+                <!-- Eyes -->
+                <ellipse id="eye-l" cx="46" cy="48" rx="5" ry="6" fill="var(--avatar-eye)" />
+                <ellipse id="eye-r" cx="74" cy="48" rx="5" ry="6" fill="var(--avatar-eye)" />
+                <!-- Pupils -->
+                <ellipse cx="47" cy="49" rx="2.5" ry="3" fill="#111" />
+                <ellipse cx="75" cy="49" rx="2.5" ry="3" fill="#111" />
+                <!-- Eye shine -->
+                <circle cx="48.5" cy="47.5" r="1" fill="white"/>
+                <circle cx="76.5" cy="47.5" r="1" fill="white"/>
+                <!-- Nose -->
+                <ellipse cx="60" cy="63" rx="3" ry="4" fill="var(--avatar-shadow)" opacity="0.4"/>
+                <!-- Mouth -->
+                <path id="mouth" d="M 50 73 Q 60 80 70 73" stroke="var(--avatar-shadow)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <!-- Hair -->
+                <ellipse cx="60" cy="15" rx="38" ry="22" fill="var(--avatar-hair)" />
+                <ellipse cx="60" cy="55" rx="38" ry="16" fill="var(--avatar-hair)" />
+                <ellipse cx="60" cy="22" rx="38" ry="22" fill="var(--avatar-skin)" />
+                <!-- Collar -->
+                <path d="M 22 99 L 42 88 L 60 94 L 78 88 L 98 99" stroke="var(--avatar-collar)" stroke-width="3" fill="none"/>
+                <!-- Suit -->
+                <path d="M 22 120 L 22 99 L 42 88 L 60 94 L 78 88 L 98 99 L 98 120 Z" fill="var(--avatar-suit)" />
+                <!-- Tie -->
+                <path d="M 55 94 L 60 94 L 65 94 L 63 110 L 60 115 L 57 110 Z" fill="var(--avatar-tie)" />
+              </svg>
+            </div>
+          </div>
+          <!-- Speaking wave -->
+          <div class="speaking-wave" id="speaking-wave">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+        <div class="interviewer-name-tag">Alex Chen</div>
+        <div class="interviewer-title-tag">Senior Technical Interviewer</div>
+      </section>
+
+      <!-- Chat transcript -->
+      <section class="transcript-section" id="transcript">
+        <div class="transcript-inner" id="transcript-inner">
+          <!-- Messages injected here -->
+        </div>
+      </section>
+
+      <!-- Voice Controls -->
+      <footer class="voice-controls">
+        <div class="transcript-live" id="live-transcript">
+          <span id="live-text">Press and hold to speak…</span>
+        </div>
+        <div class="controls-row">
+          <button id="voice-btn" class="voice-btn" title="Hold to speak">
+            <span class="mic-icon">🎙</span>
+            <span class="voice-label">Hold to Speak</span>
+          </button>
+        </div>
+        <p class="voice-hint">Or <button id="type-toggle" class="link-btn">type your answer</button></p>
+
+        <!-- Text fallback -->
+        <div id="text-input-row" class="text-input-row hidden">
+          <input type="text" id="text-input" placeholder="Type your answer…" />
+          <button id="send-text-btn" class="btn-send">Send</button>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Feedback Modal -->
+  <div id="feedback-modal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card">
+      <button id="close-feedback" class="close-btn">✕</button>
+      <h2>Interview Feedback</h2>
+      <div id="feedback-content">
+        <div class="loading-spinner">Analyzing your interview…</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
